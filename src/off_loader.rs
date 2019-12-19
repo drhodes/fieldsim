@@ -48,7 +48,7 @@ impl OffLoader {
         let v3 = self.verts[i3].clone();
 
         self.faces.push(Face {
-            points: [v1, v2, v3],
+            verts: [v1, v2, v3],
         });
 
         Ok(())

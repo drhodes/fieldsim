@@ -21,8 +21,16 @@ pub struct Segment {
 }
 
 pub struct Face {
-    pub points: [Point3; 3],
+    pub verts: [Point3; 3],
 }
+
+#[derive(Clone, PartialEq)]
+pub enum Sign {
+    Zero,
+    Pos,
+    Neg,
+}
+pub use Sign::*;
 
 pub struct Obj {
     pub faces: Vec<Face>,

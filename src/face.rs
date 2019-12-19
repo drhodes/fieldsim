@@ -3,48 +3,39 @@ use crate::types::*;
 impl Face {
     // Ray Triangle Intersection
     // https://stackoverflow.com/questions/53962225/
-    pub fn intersects_segment(&self, _seg: &Segment) -> bool {
-        // let mut intersects = false;
-        // for face in self.faces {
-        //     let vol1 = self.tetrahedron_volume(&[face[0], face[2], face[3], seg[0]]);
-        //     if vol1 == 0.0 {
-        //         continue;
-        //     }
-        //     let vol2 = self.tetrahedron_volume(&[face[0], face[2], face[3], seg[1]]);
-        //     if vol2 == 0.0 {
-        //         continue;
-        //     }
-        //     let vol3 = self.tetrahedron_volume(&[face[0], face[2], face[3], seg[1]]);
-        //     if vol3 == 0.0 {
-        //         continue;
-        //     }
-        //     if vol1 < 0.0 && vol2 < 0.0 && vol3 < 0.0 {
-        //         intersects = !intersects;
-        //         continue;
-        //     }
-        //     if vol1 > 0.0 && vol2 > 0.0 && vol3 > 0.0 {
-        //         intersects = !intersects;
-        //         continue;
-        //     }
-        unimplemented!()
+    // pg 237, Computational Geometry in C
+    pub fn intersects_segment(&self, seg: &Segment) -> bool {
+        let [a, b, c] = &self.verts;
+        let (d, e) = (&seg.p1, &seg.p2);
+
+        let vol1 = Face::volume_sign(d, a, b, e);
+        let vol2 = Face::volume_sign(d, b, c, e);
+        let vol3 = Face::volume_sign(d, c, a, e);
+
+        ((vol1 == Neg && vol2 == Neg && vol3 == Neg) || (vol1 == Pos && vol2 == Pos && vol3 == Pos))
+
+        // ignores degenerate forms: segment in plane of triangle, segment intersects points.
     }
 
-    // the math
-    // https://stackoverflow.com/questions/53962225/
-    fn tetrahedron_volume(&self, ps: &[Point3; 4]) -> f64 {
-        // 4x4 determinant.
-        // can this be vectorized?
-        let (a, b, c, d) = (ps[0].x, ps[0].y, ps[0].z, 1.0);
-        let (e, f, g, h) = (ps[1].x, ps[1].y, ps[1].z, 1.0);
-        let (i, j, k, l) = (ps[2].x, ps[2].y, ps[2].z, 1.0);
-        let (m, n, o, p) = (ps[3].x, ps[3].y, ps[3].z, 1.0);
-
-        let s1 = a * (f * k * p - f * l * o - g * j * p + g * l * n + h * j * o - h * k * n);
-        let s2 = b * (e * k * p - e * l * o - g * i * p + g * l * m + h * j * o - h * k * m);
-        let s3 = c * (e * j * p - e * l * n - f * i * p + f * l * m + h * i * n - h * j * m);
-        let s4 = d * (e * j * o - e * k * n - f * i * o + f * k * m + g * i * n - g * j * m);
-
-        (s1 + s2 + s3 + s4) / 6.0
+    // pg 131, Computational Geometry in C
+    fn volume_sign(v0: &Point3, v1: &Point3, v2: &Point3, p: &Point3) -> Sign {
+        let ax = v0.x - p.x;
+        let ay = v0.y - p.y;
+        let az = v0.z - p.z;
+        let bx = v1.x - p.x;
+        let by = v1.y - p.y;
+        let bz = v1.z - p.z;
+        let cx = v2.x - p.x;
+        let cy = v2.y - p.y;
+        let cz = v2.z - p.z;
+        let vol = ax * (by * cz - bz * cy) + ay * (bz * cx - bx * cz) + az * (bx * cy - by * cx);
+        if vol > 0.5 {
+            Pos
+        } else if vol < -0.5 {
+            Neg
+        } else {
+            Zero
+        }
     }
 }
 
@@ -55,11 +46,34 @@ mod tests {
     #[test]
     fn vol1() {
         let o = Obj { faces: vec![] };
-        let p1 = Point3::new(0.0, 0.0, 1.0);
-        let p2 = Point3::new(1.0, 0.0, 0.0);
-        let p3 = Point3::new(0.0, 1.0, 0.0);
-        let p4 = Point3::new(0.0, 0.0, 0.0);
+        let p1 = Point3::new(0.0, 0.0, 0.0);
+        let p2 = Point3::new(9.0, 0.0, 0.0);
+        let p3 = Point3::new(0.0, 9.0, 0.0);
+        let face = Face {
+            verts: [p1, p2, p3],
+        };
+        let seg = Segment {
+            p1: Point3::new(2.0, 2.0, -1.0),
+            p2: Point3::new(2.0, 2.0, 1.0),
+        };
+        assert!(face.intersects_segment(&seg));
+    }
 
-        println!("{:?}", o.tetrahedron_volume(&[p1, p2, p3, p4]));
+    #[test]
+    fn vol2() {
+        let o = Obj { faces: vec![] };
+        let p1 = Point3::new(0.0, 0.0, 0.0);
+        let p2 = Point3::new(9.0, 0.0, 0.0);
+        let p3 = Point3::new(0.0, 9.0, 0.0);
+        let face = Face {
+            verts: [p1, p2, p3],
+        };
+        let seg = Segment {
+            p1: Point3::new(1.0, 1.0, -1.0),
+            p2: Point3::new(1.0, 1.0, 1.0),
+        };
+        let b = face.intersects_segment(&seg);
+        println!("{:?}", b);
+        assert!(b);
     }
 }
