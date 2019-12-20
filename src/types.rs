@@ -1,3 +1,4 @@
+use rand::Rng;
 use std::error::Error;
 
 pub type FieldResult<T> = Result<T, Box<dyn Error>>;
@@ -15,11 +16,13 @@ impl Point3 {
     }
 }
 
+#[derive(Debug)]
 pub struct Segment {
     pub p1: Point3,
     pub p2: Point3,
 }
 
+#[derive(Debug)]
 pub struct Face {
     pub verts: [Point3; 3],
 }
@@ -33,10 +36,21 @@ pub enum Sign {
 pub use Sign::*;
 
 pub struct Obj {
+    pub bbox: BoundingBox,
     pub faces: Vec<Face>,
 }
 
 pub struct OffLoader {
     pub verts: Vec<Point3>,
     pub faces: Vec<Face>,
+}
+
+pub struct BoundingBox {
+    pub xmin: f64,
+    pub xmax: f64,
+    pub ymin: f64,
+    pub ymax: f64,
+    pub zmin: f64,
+    pub zmax: f64,
+    pub rng: rand::rngs::ThreadRng,
 }
