@@ -1,0 +1,1 @@
+#[rustfmt_skip]  // requires nightly and #![feature(custom_attribute)] in crate root

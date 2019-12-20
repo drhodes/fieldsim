@@ -12,8 +12,13 @@ impl Obj {
     }
 
     pub fn point_inside(&self, p: &Point3) -> bool {
-        // consider 3-space hash to reduce the number of checked faces.
+        // consider spacehash to reduce the number of checked faces.
         // it's easier to implement than OctTree with similar performance.
         //
+        // let num_intersections = 0;
+        // for face in self.faces {
+        //     if face.int
+        // }
+        unimplemented!();
     }
 }

@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_must_use)]
 #![allow(unused_variables)]
+#![allow(unused_imports)]
 
 #[macro_use]
 extern crate simple_error;
