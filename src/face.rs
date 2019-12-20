@@ -1,58 +1,32 @@
 use crate::types::*;
-use nalgebra;
+use bvh::aabb::AABB;
+use bvh::nalgebra::{Point3, Vector3};
+use bvh::ray::Ray;
 use std::cmp::{max, min};
 
 impl Face {
-    pub fn new(x: Point3, y: Point3, z: Point3) -> Face {
+    pub fn new(x: Point3<f32>, y: Point3<f32>, z: Point3<f32>) -> Face {
         Face { verts: [x, y, z] }
     }
-    pub fn maxs(&self) -> (f64, f64, f64) {
-        let xmax = f64::max(f64::max(self.verts[0].x, self.verts[1].x), self.verts[2].x);
-        let ymax = f64::max(f64::max(self.verts[0].y, self.verts[1].y), self.verts[2].y);
-        let zmax = f64::max(f64::max(self.verts[0].z, self.verts[1].z), self.verts[2].z);
+    pub fn maxs(&self) -> (f32, f32, f32) {
+        let xmax = f32::max(f32::max(self.verts[0].x, self.verts[1].x), self.verts[2].x);
+        let ymax = f32::max(f32::max(self.verts[0].y, self.verts[1].y), self.verts[2].y);
+        let zmax = f32::max(f32::max(self.verts[0].z, self.verts[1].z), self.verts[2].z);
         (xmax, ymax, zmax)
     }
 
-    pub fn mins(&self) -> (f64, f64, f64) {
-        let xmin = f64::min(f64::min(self.verts[0].x, self.verts[1].x), self.verts[2].x);
-        let ymin = f64::min(f64::min(self.verts[0].y, self.verts[1].y), self.verts[2].y);
-        let zmin = f64::min(f64::min(self.verts[0].z, self.verts[1].z), self.verts[2].z);
+    pub fn mins(&self) -> (f32, f32, f32) {
+        let xmin = f32::min(f32::min(self.verts[0].x, self.verts[1].x), self.verts[2].x);
+        let ymin = f32::min(f32::min(self.verts[0].y, self.verts[1].y), self.verts[2].y);
+        let zmin = f32::min(f32::min(self.verts[0].z, self.verts[1].z), self.verts[2].z);
         (xmin, ymin, zmin)
     }
 
     pub fn intersect(&self, seg: &Segment) -> bool {
-        self.moller_trumbore(seg)
-    }
-
-    pub fn moller_trumbore(&self, seg: &Segment) -> bool {
-        const EPSILON: f64 = 1e-8;
-        let [v0, v1, v2] = &self.verts;
-        let (ray_origin, ray_end) = (&seg.p1, &seg.p2);
-        let mut ray = ray_end - ray_origin;
-
-        ray = ray.scalar_mul(1.0 / ray.len());
-
-        let edge1 = v1 - v2;
-        let edge2 = v2 - v0;
-        let h = ray.cross(&edge2);
-        let a = edge1.dot(&h);
-
-        if a > -EPSILON || a < EPSILON {
-            return false;
-        }
-
-        let f = 1.0 / a;
-        let s = ray_origin - v0;
-        let u = f * s.dot(&h);
-        if u < 0.0 || u > 1.0 {
-            return false;
-        }
-
-        let q = s.cross(&edge1);
-        let v = f * ray.dot(&q);
-        let t = f * edge2.dot(&q);
-
-        return t > EPSILON && t < 1.0 / EPSILON;
+        let dir = seg.p2 - seg.p1;
+        let ray = Ray::new(seg.p1, dir);
+        let intersection = ray.intersects_triangle(&self.verts[0], &self.verts[1], &self.verts[2]);
+        intersection.distance != std::f32::INFINITY
     }
 }
 
@@ -75,8 +49,8 @@ mod tests {
 
     #[test]
     fn vol1() {
-        let p1 = Point3::new(0.0, 0.0, 0.0);
-        let p2 = Point3::new(9.0, 0.0, 0.0);
+        let p1 = Point3::new(9.0, 0.0, 0.0);
+        let p2 = Point3::new(0.0, 0.0, 0.0);
         let p3 = Point3::new(0.0, 9.0, 0.0);
         let face = Face {
             verts: [p1, p2, p3],
@@ -89,7 +63,7 @@ mod tests {
         assert!(b);
     }
 
-    //#[test]
+    #[test]
     fn face1() {
         let face = Face::new(
             Point3::new(0.0, 0.0, 0.0),
@@ -107,8 +81,8 @@ mod tests {
     #[test]
     fn face2() {
         let face = Face::new(
-            Point3::new(1.0, 0.0, 0.0),
             Point3::new(0.0, 1.0, 0.0),
+            Point3::new(1.0, 0.0, 0.0),
             Point3::new(0.0, 0.0, 1.0),
         );
         let seg = Segment {
@@ -121,11 +95,10 @@ mod tests {
 
     #[test]
     fn face3() {
-        let face = Face::new(
-            Point3::new(0.0, -6.0, 0.0),
-            Point3::new(0.0, 0.0, -6.0),
-            Point3::new(-6.0, 0.0, 0.0),
-        );
+        let p1 = Point3::new(-6.0, 0.0, 0.0);
+        let p2 = Point3::new(0.0, -6.0, 0.0);
+        let p3 = Point3::new(0.0, 0.0, -6.0);
+        let face = Face::new(p1, p2, p3);
         let seg = Segment {
             p1: Point3::new(0.0, 0.0, 0.0),
             p2: Point3::new(1.0, 1.0, 1.0),

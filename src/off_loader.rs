@@ -1,5 +1,6 @@
 //use std::error::Error;
 //use std::fs;
+use bvh::nalgebra::{Point3, Vector3};
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Lines};
@@ -28,10 +29,10 @@ impl OffLoader {
     }
 
     fn add_vert(&mut self, floats: Vec<&str>) -> FieldResult<()> {
-        let x: f64 = floats[0].parse()?;
-        let y: f64 = floats[1].parse()?;
-        let z: f64 = floats[2].parse()?;
-        self.verts.push(Point3 { x, y, z });
+        let x: f32 = floats[0].parse()?;
+        let y: f32 = floats[1].parse()?;
+        let z: f32 = floats[2].parse()?;
+        self.verts.push(Point3::new(x, y, z));
         Ok(())
     }
 
@@ -48,7 +49,10 @@ impl OffLoader {
         let v3 = self.verts[i3].clone();
 
         self.faces.push(Face {
-            verts: [v1, v2, v3],
+            // openscad outputs faces with what orientation?  need to
+            // flip them around because ray is eminating from inside
+            // the object.
+            verts: [v2, v1, v3],
         });
 
         Ok(())

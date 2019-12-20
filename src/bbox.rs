@@ -1,11 +1,12 @@
+use bvh::nalgebra::{Point3, Vector3};
 use crate::types::*;
 use rand::Rng;
 
 impl BoundingBox {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     pub fn from_faces(faces: &Vec<Face>) -> BoundingBox {
-        const SMALL: f64 = 1e-20;
-        const BIG: f64 = 1e20;
+        const SMALL: f32 = 1e-20;
+        const BIG: f32 = 1e20;
         
         let (mut xmin, mut xmax) = (BIG, SMALL);
         let (mut ymin, mut ymax) = (BIG, SMALL);
@@ -26,21 +27,21 @@ impl BoundingBox {
         BoundingBox{rng, xmin, xmax, ymin, ymax, zmin, zmax}
     }
 
-    pub fn make_point_inside(&mut self) -> Point3 {
+    pub fn make_point_inside(&mut self) -> Point3<f32> {
         let dx = self.xmax - self.xmin;
-        let x = self.xmin + dx * self.rng.gen::<f64>();
+        let x = self.xmin + dx * self.rng.gen::<f32>();
         let dy = self.ymax - self.ymin;
-        let y = self.ymin + dy * self.rng.gen::<f64>();
+        let y = self.ymin + dy * self.rng.gen::<f32>();
         let dz = self.zmax - self.zmin;
-        let z = self.zmin + dz * self.rng.gen::<f64>();
-        Point3{x,y,z}
+        let z = self.zmin + dz * self.rng.gen::<f32>();
+        Point3::new(x,y,z)
     }
 
-    pub fn make_point_outside(&mut self) -> Point3 {
+    pub fn make_point_outside(&mut self) -> Point3<f32> {
         let x = 200.0 * self.xmax + 0.1; 
         let y = 300.0 * self.ymax + 0.1;
         let z = 500.0 * self.zmax + 0.1;
-        Point3{x,y,z}
+        Point3::new(x,y,z)
     }
 
 }
