@@ -1,7 +1,4 @@
-use bvh::nalgebra::{Point3, Vector3};
 use fieldsim::types::*;
-use std::error::Error;
-use std::fs;
 use std::path::Path;
 
 fn main() {
@@ -9,7 +6,10 @@ fn main() {
     let mut hits = 0;
     let n = 1000;
     for _ in 0..n {
+        // make a p inside the bounding box, not necessarily inside the object,
         let p = obj.bbox.make_point_inside();
+
+        // well, is the point inside the object?
         if obj.is_point_inside(&p) {
             hits += 1;
         }
