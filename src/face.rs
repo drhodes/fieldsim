@@ -23,10 +23,91 @@ impl Face {
     }
 
     pub fn intersect(&self, seg: &Segment) -> bool {
-        let dir = seg.p2 - seg.p1;
-        let ray = Ray::new(seg.p1, dir);
-        let intersection = ray.intersects_triangle(&self.verts[0], &self.verts[1], &self.verts[2]);
-        intersection.distance != std::f32::INFINITY
+        return self.jimenez(seg);
+        // let dir = seg.p2 - seg.p1;
+        // let ray = Ray::new(seg.p1, dir);
+        // let intersection = ray.intersects_triangle(&self.verts[0], &self.verts[1], &self.verts[2]);
+        // intersection.distance != std::f32::INFINITY
+    }
+
+    pub fn jimenez(&self, seg: &Segment) -> bool {
+        let [v1, v2, v3] = &self.verts;
+        let (q1, q2) = (&seg.p1, &seg.p2);
+
+        let eps = 1e-6;
+
+        let a = q1 - v3;
+        let b = v1 - v3;
+        let c = v2 - v3;
+        let w1 = b.cross(&c);
+        let w = a.dot(&w1);
+        let d = q2 - v3;
+        let s = d.dot(&w1);
+
+        if w > eps {
+            if s > eps {
+                return false;
+            }
+            let w2 = a.cross(&d);
+            let t = w2.dot(&c);
+            if t < -eps {
+                return false;
+            }
+            let u = -(w2.dot(&b));
+            if u < -eps {
+                return false;
+            }
+            if w < (s + t + u) {
+                return false;
+            }
+        } else if w < -eps {
+            if s < -eps {
+                return false;
+            }
+            let w2 = a.cross(&d);
+            let t = w2.dot(&c);
+            if t < eps {
+                return false;
+            }
+            let u = -w2.dot(&b);
+            if u > eps {
+                return false;
+            }
+            if w > (s + t + u) {
+                return false;
+            }
+        } else {
+            if s > eps {
+                let w2 = d.cross(&a);
+                let t = w2.dot(&c);
+                if t < -eps {
+                    return false;
+                }
+                let u = -w2.dot(&b);
+                if u < -eps {
+                    return false;
+                }
+                if -s < (t + u) {
+                    return false;
+                }
+            } else if s < -eps {
+                let w2 = d.cross(&a);
+                let t = w2.dot(&c);
+                if t > eps {
+                    return false;
+                }
+                let u = -w2.dot(&b);
+                if u > eps {
+                    return false;
+                }
+                if -s > (t + u) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
