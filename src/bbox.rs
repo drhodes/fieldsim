@@ -1,4 +1,3 @@
-use bvh::nalgebra::{Point3, Vector3};
 use crate::types::*;
 use rand::Rng;
 
@@ -27,7 +26,7 @@ impl BoundingBox {
         BoundingBox{rng, xmin, xmax, ymin, ymax, zmin, zmax}
     }
 
-    pub fn make_point_inside(&mut self) -> Point3<f32> {
+    pub fn make_point_inside(&mut self) -> Point3 {
         let dx = self.xmax - self.xmin;
         let x = self.xmin + dx * self.rng.gen::<f32>();
         let dy = self.ymax - self.ymin;
@@ -37,7 +36,7 @@ impl BoundingBox {
         Point3::new(x,y,z)
     }
 
-    pub fn make_point_outside(&mut self) -> Point3<f32> {
+    pub fn make_point_outside(&mut self) -> Point3 {
         let x = 200.0 * self.xmax + 0.1; 
         let y = 300.0 * self.ymax + 0.1;
         let z = 500.0 * self.zmax + 0.1;

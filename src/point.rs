@@ -41,6 +41,9 @@ impl fmt::Debug for Point3 {
 }
 
 impl Point3 {
+    pub fn new(x: f32, y: f32, z: f32) -> Point3 {
+        return Point3 { x, y, z };
+    }
     pub fn cross(&self, rhs: &Point3) -> Point3 {
         let x = self.y * rhs.z - self.z * rhs.y;
         let y = self.z * rhs.x - self.x * rhs.z;
@@ -48,14 +51,14 @@ impl Point3 {
         Point3::new(x, y, z)
     }
 
-    pub fn dot(&self, rhs: &Point3) -> f64 {
+    pub fn dot(&self, rhs: &Point3) -> f32 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    pub fn len(&self) -> f64 {
+    pub fn len(&self) -> f32 {
         (self.x * self.x + self.y * self.y + self.z + self.z).sqrt()
     }
-    pub fn scalar_mul(&self, n: f64) -> Point3 {
+    pub fn scalar_mul(&self, n: f32) -> Point3 {
         Point3::new(self.x * n, self.y * n, self.z + n)
     }
 }

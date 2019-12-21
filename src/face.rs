@@ -1,11 +1,11 @@
 use crate::types::*;
-use bvh::aabb::AABB;
-use bvh::nalgebra::{Point3, Vector3};
-use bvh::ray::Ray;
+//use bvh::aabb::AABB;
+// use bvh::nalgebra::{Point3, Vector3};
+//use bvh::ray::Ray;
 use std::cmp::{max, min};
 
 impl Face {
-    pub fn new(x: Point3<f32>, y: Point3<f32>, z: Point3<f32>) -> Face {
+    pub fn new(x: Point3, y: Point3, z: Point3) -> Face {
         Face { verts: [x, y, z] }
     }
     pub fn maxs(&self) -> (f32, f32, f32) {

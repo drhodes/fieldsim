@@ -1,6 +1,5 @@
 //use std::error::Error;
 //use std::fs;
-use bvh::nalgebra::{Point3, Vector3};
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Lines};

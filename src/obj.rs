@@ -1,5 +1,4 @@
 use crate::types::*;
-use bvh::nalgebra::{Point3, Vector3};
 use std::error::Error;
 use std::fs;
 use std::path::Path;
@@ -15,7 +14,7 @@ impl Obj {
     }
 
     /// does a point p fall inside the object?
-    pub fn is_point_inside(&mut self, p: &Point3<f32>) -> bool {
+    pub fn is_point_inside(&mut self, p: &Point3) -> bool {
         let out = self.bbox.make_point_outside();
         let seg = Segment {
             p1: p.clone(),
