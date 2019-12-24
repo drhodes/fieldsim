@@ -13,6 +13,15 @@ heaptrack:
 debug: ## debug with gdb
 	rust-gdb $(EXE)
 
+wasm-release: ## build the wasm release
+	cargo build --target=wasm32-wasi --release
+
+wasmer-run: wasm-release
+	wasmer --dir=. target/wasm32-wasi/release/fieldsim.wasm
+
+wasmtime-run: wasm-release
+	wasmtime --dir=. target/wasm32-wasi/release/fieldsim.wasm
+
 build: ## build
 	cargo build		
 
