@@ -8,20 +8,21 @@ It doesn't work yet.
 
 a quick check to see how the runtime performance stacks up between
 WASM running under wasmtime and native code show that native code runs
-roughly 25x faster at the moment. But it runs! Doing file I/O without 
+roughly 3x faster at the moment.
 
 -----
+```bash
+$ time wasmtime --dir=. target/wasm32-wasi/release/fieldsim.wasm
+π: 4.05
 
-20:49 $ time wasmtime --dir=. fieldsim.wasm 
-π: 3.978
-
-real	0m0.746s
-user	0m0.700s
-sys	0m0.044s
-
+real	0m0.095s
+user	0m0.068s
+sys	0m0.024s
+```
 -----
 
-20:50 $ time cargo run --release 
+```bash
+$ time cargo run --release 
     Finished release [optimized] target(s) in 0.01s
      Running `target/release/fieldsim`
 π: 3.966
@@ -29,4 +30,4 @@ sys	0m0.044s
 real	0m0.030s
 user	0m0.016s
 sys	0m0.012s
-~/rustcourse/fieldsim [master|…1] 
+```
